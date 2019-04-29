@@ -13,7 +13,7 @@ export class TestRail {
 
   public createRun(name: string, description: string) {
     try {
-      this.runId = fs.readFileSync('runId', 'UTF-8')
+      this.runId = Number(process.env.runId);
     } catch {
       axios({
         method: 'post',
@@ -32,7 +32,7 @@ export class TestRail {
       })
         .then(response => {
           this.runId = response.data.id;
-          fs.writeFileSync('runId', this.runId)
+          process.env.runId = String(this.runId);
         })
         .catch(error => console.error(error));
     }

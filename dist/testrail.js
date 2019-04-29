@@ -11,7 +11,7 @@ var TestRail = /** @class */ (function () {
     TestRail.prototype.createRun = function (name, description) {
         var _this = this;
         try {
-            this.runId = fs.readFileSync('runId', 'UTF-8');
+            this.runId = Number(process.env.runId);
         }
         catch (_a) {
             axios({
@@ -31,7 +31,7 @@ var TestRail = /** @class */ (function () {
             })
                 .then(function (response) {
                 _this.runId = response.data.id;
-                fs.writeFileSync('runId', _this.runId);
+                process.env.runId = String(_this.runId);
             })
                 .catch(function (error) { return console.error(error); });
         }

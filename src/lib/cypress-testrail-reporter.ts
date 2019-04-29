@@ -7,6 +7,7 @@ const chalk = require('chalk');
 
 export class CypressTestRailReporter extends reporters.Spec {
   private testRail: TestRail;
+  private results;
 
   constructor(runner: any, options: any) {
     super(runner);
@@ -28,30 +29,32 @@ export class CypressTestRailReporter extends reporters.Spec {
     runner.on('pass', test => {
       const caseIds = titleToCaseIds(test.title);
       if (caseIds.length > 0) {
-        const results = caseIds.map(caseId => {
+        this. results = caseIds.map(caseId => {
           return {
             case_id: caseId,
             status_id: Status.Passed,
             comment: `Execution time: ${test.duration}ms`,
           };
         });
-        this.testRail.publishResults(results);
       }
     });
 
     runner.on('fail', test => {
       const caseIds = titleToCaseIds(test.title);
       if (caseIds.length > 0) {
-        const results = caseIds.map(caseId => {
+        this. results = caseIds.map(caseId => {
           return {
             case_id: caseId,
             status_id: Status.Failed,
             comment: `${test.err.message}`,
           };
         });
-        this.testRail.publishResults(results);
       }
     });
+
+    runner.on('end', () => {
+      this.testRail.publishResults(this.results);
+    })
   }
 
   private validate(options, name: string) {

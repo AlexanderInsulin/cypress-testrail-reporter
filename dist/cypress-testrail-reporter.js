@@ -34,28 +34,29 @@ var CypressTestRailReporter = /** @class */ (function (_super) {
         runner.on('pass', function (test) {
             var caseIds = shared_1.titleToCaseIds(test.title);
             if (caseIds.length > 0) {
-                var results = caseIds.map(function (caseId) {
+                _this.results = caseIds.map(function (caseId) {
                     return {
                         case_id: caseId,
                         status_id: testrail_interface_1.Status.Passed,
                         comment: "Execution time: " + test.duration + "ms",
                     };
                 });
-                _this.testRail.publishResults(results);
             }
         });
         runner.on('fail', function (test) {
             var caseIds = shared_1.titleToCaseIds(test.title);
             if (caseIds.length > 0) {
-                var results = caseIds.map(function (caseId) {
+                _this.results = caseIds.map(function (caseId) {
                     return {
                         case_id: caseId,
                         status_id: testrail_interface_1.Status.Failed,
                         comment: "" + test.err.message,
                     };
                 });
-                _this.testRail.publishResults(results);
             }
+        });
+        runner.on('end', function () {
+            _this.testRail.publishResults(_this.results);
         });
         return _this;
     }
