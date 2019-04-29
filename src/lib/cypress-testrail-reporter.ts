@@ -6,7 +6,6 @@ import { Status, TestRailResult } from './testrail.interface';
 const chalk = require('chalk');
 
 export class CypressTestRailReporter extends reporters.Spec {
-  private results: TestRailResult[] = [];
   private testRail: TestRail;
 
   constructor(runner: any, options: any) {
@@ -36,7 +35,7 @@ export class CypressTestRailReporter extends reporters.Spec {
             comment: `Execution time: ${test.duration}ms`,
           };
         });
-        this.results.push(...results);
+        this.testRail.publishResults(results);
       }
     });
 
@@ -50,24 +49,8 @@ export class CypressTestRailReporter extends reporters.Spec {
             comment: `${test.err.message}`,
           };
         });
-        this.results.push(...results);
+        this.testRail.publishResults(results);
       }
-    });
-
-    runner.on('end', () => {
-      if (this.results.length == 0) {
-        console.log('\n', chalk.magenta.underline.bold('(TestRail Reporter)'));
-        console.warn(
-          '\n',
-          'No testcases were matched. Ensure that your tests are declared correctly and matches Cxxx',
-          '\n'
-        );
-        this.testRail.deleteRun();
-
-        return;
-      }
-
-      this.testRail.publishResults(this.results);
     });
   }
 

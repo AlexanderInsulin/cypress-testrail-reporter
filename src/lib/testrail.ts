@@ -1,5 +1,6 @@
 const axios = require('axios');
 const chalk = require('chalk');
+const fs = require('fs');
 import { TestRailOptions, TestRailResult } from './testrail.interface';
 
 export class TestRail {
@@ -11,25 +12,30 @@ export class TestRail {
   }
 
   public createRun(name: string, description: string) {
-    axios({
-      method: 'post',
-      url: `${this.base}/add_run/${this.options.projectId}`,
-      headers: { 'Content-Type': 'application/json' },
-      auth: {
-        username: this.options.username,
-        password: this.options.password,
-      },
-      data: JSON.stringify({
-        suite_id: this.options.suiteId,
-        name,
-        description,
-        include_all: true,
-      }),
-    })
-      .then(response => {
-        this.runId = response.data.id;
+    try {
+      fs.readFileSync('kek')
+    } catch {
+      axios({
+        method: 'post',
+        url: `${this.base}/add_run/${this.options.projectId}`,
+        headers: { 'Content-Type': 'application/json' },
+        auth: {
+          username: this.options.username,
+          password: this.options.password,
+        },
+        data: JSON.stringify({
+          suite_id: this.options.suiteId,
+          name,
+          description,
+          include_all: true,
+        }),
       })
-      .catch(error => console.error(error));
+        .then(response => {
+          this.runId = response.data.id;
+          fs.writeFileSync('kek')
+        })
+        .catch(error => console.error(error));
+    }
   }
 
   public deleteRun() {
