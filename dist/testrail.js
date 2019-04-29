@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios = require('axios');
 var chalk = require('chalk');
+var fs = require('fs');
 var TestRail = /** @class */ (function () {
     function TestRail(options) {
         this.options = options;
@@ -9,25 +10,31 @@ var TestRail = /** @class */ (function () {
     }
     TestRail.prototype.createRun = function (name, description) {
         var _this = this;
-        axios({
-            method: 'post',
-            url: this.base + "/add_run/" + this.options.projectId,
-            headers: { 'Content-Type': 'application/json' },
-            auth: {
-                username: this.options.username,
-                password: this.options.password,
-            },
-            data: JSON.stringify({
-                suite_id: this.options.suiteId,
-                name: name,
-                description: description,
-                include_all: true,
-            }),
-        })
-            .then(function (response) {
-            _this.runId = response.data.id;
-        })
-            .catch(function (error) { return console.error(error); });
+        try {
+            this.runId = fs.readFileSync('runId', 'UTF-8');
+        }
+        catch (_a) {
+            axios({
+                method: 'post',
+                url: this.base + "/add_run/" + this.options.projectId,
+                headers: { 'Content-Type': 'application/json' },
+                auth: {
+                    username: this.options.username,
+                    password: this.options.password,
+                },
+                data: JSON.stringify({
+                    suite_id: this.options.suiteId,
+                    name: name,
+                    description: description,
+                    include_all: true,
+                }),
+            })
+                .then(function (response) {
+                _this.runId = response.data.id;
+                fs.writeFileSync('runId', _this.runId);
+            })
+                .catch(function (error) { return console.error(error); });
+        }
     };
     TestRail.prototype.deleteRun = function () {
         axios({
